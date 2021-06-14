@@ -56,8 +56,7 @@ class WC_frisbee extends WC_Payment_Gateway
 
         $this->liveurl = 'https://api.fondy.eu/api/checkout/redirect/';
         $this->refundurl = 'https://api.fondy.eu/api/reverse/order_id';
-        //$this->title = $this->get_option('title');
-        $this->title = $this->get_option(sprintf('frisbee_payment_text_%s', get_locale())) ?: __('Buy now pay later with Frisbee', self::DOMAIN);
+        $this->title = __('Buy now pay later with Frisbee', self::DOMAIN);
         $this->test_mode = $this->get_option('test_mode');
         $this->calendar = $this->get_option('calendar');
         $this->redirect_page_id = $this->get_option('redirect_page_id');
@@ -144,7 +143,7 @@ class WC_frisbee extends WC_Payment_Gateway
     {
         $icon =
             '<img 
-                    style="width: 100%;max-width:170px;min-width: 120px;float: right;" 
+                    style="float: left;" 
                     src="'  . FRISBEE_BASE_PATH . 'assets/img/frisbee.png' . '" 
                     alt="Frisbee" />';
         if ($this->get_option('showlogo') == "yes") {
@@ -315,32 +314,6 @@ class WC_frisbee extends WC_Payment_Gateway
                 'description' => __('Order status when payment was declined.', 'frisbee-woocommerce-payment-gateway')
             ),
         );
-
-        foreach (self::LOCALES as $locale => $country) {
-            $formField = sprintf('frisbee_payment_text_%s', $locale);
-            $this->form_fields[$formField] = array(
-                'title' => sprintf('%s payment test', $country),
-                'type' => 'text',
-                'default' => $this->getTranslatedText('Buy now pay later with Frisbee', $locale),
-            );
-        }
-    }
-
-    /**
-     * @param string $text
-     * @param string $locale
-     * @return string
-     */
-    private function getTranslatedText($text, $locale)
-    {
-        $poFile = sprintf('%s/../languages/%s-%s.mo', __DIR__, self::DOMAIN, $locale);
-        $mo = new MO();
-        $mo->import_from_file($poFile);
-        if (isset($mo->entries[$text]->translations)) {
-            return reset($mo->entries[$text]->translations);
-        }
-
-        return $text;
     }
 
     /*
@@ -518,7 +491,7 @@ class WC_frisbee extends WC_Payment_Gateway
             'response_url' => $this->getCallbackUrl(),
             'lang' => $this->getLanguage(),
             'sender_email' => $this->getEmail($order),
-            'payment_system' => 'frisbee',
+            'payment_systems' => ['card', 'frisbee'],
         );
         if ($this->calendar == 'yes') {
             $frisbee_args['required_rectoken'] = 'Y';

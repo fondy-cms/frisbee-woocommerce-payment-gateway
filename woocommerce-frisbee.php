@@ -18,7 +18,6 @@ defined( 'ABSPATH' ) or exit;
 define( 'FRISBEE_BASE_PATH' ,  plugin_dir_url( __FILE__ ) );
 if ( ! class_exists( 'WC_PaymentFrisbee' ) ) :
     class WC_PaymentFrisbee {
-        private $subscription_support_enabled = false;
         private static $instance;
 
         /**
@@ -102,11 +101,7 @@ if ( ! class_exists( 'WC_PaymentFrisbee' ) ) :
          * @return array
          */
         public function woocommerce_add_frisbee_gateway( $methods ) {
-            if ( $this->subscription_support_enabled ) {
-                $methods[] = 'WC_Frisbee_Subscriptions';
-            } else {
-                $methods[] = 'WC_frisbee';
-            }
+            $methods[] = 'WC_frisbee';
             return $methods;
         }
     }
