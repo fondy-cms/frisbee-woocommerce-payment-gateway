@@ -445,8 +445,13 @@ class WC_frisbee extends WC_Payment_Gateway
 
         $str = $password;
         foreach ($data as $k => $v) {
-            $str .= self::SIGNATURE_SEPARATOR . $v;
+            if (is_array($v)) {
+                $str .= self::SIGNATURE_SEPARATOR . str_replace('"', "'", json_encode($v, JSON_HEX_APOS));
+            } else {
+                $str .= self::SIGNATURE_SEPARATOR.$v;
+            }
         }
+
         if ($encoded) {
             return sha1($str);
         } else {
@@ -491,7 +496,7 @@ class WC_frisbee extends WC_Payment_Gateway
             'response_url' => $this->getCallbackUrl(),
             'lang' => $this->getLanguage(),
             'sender_email' => $this->getEmail($order),
-            'payment_systems' => ['card', 'frisbee'],
+            'payment_systems' => 'frisbee',
         );
         if ($this->calendar == 'yes') {
             $frisbee_args['required_rectoken'] = 'Y';
@@ -512,11 +517,11 @@ class WC_frisbee extends WC_Payment_Gateway
         }
         $frisbee_args['signature'] = $this->getSignature($frisbee_args, $this->salt);
 
-        $url = $this->get_checkout($frisbee_args);
+        $url = $this->get_redirect($frisbee_args);
         $out = '';
         $url = WC()->session->get('session_token_' . $this->merchant_id . '_' . $order_id);
         if (empty($url)) {
-            $url = $this->get_checkout($frisbee_args);
+            $url = $this->get_redirect($frisbee_args);
             WC()->session->set('session_token_' . $this->merchant_id . '_' . $order_id, $url);
         }
         if ($this->page_mode == 'no') {
@@ -597,6 +602,54 @@ class WC_frisbee extends WC_Payment_Gateway
                 unset($args['signature']);
                 $args['signature'] = $this->getSignature($args, $this->salt);
                 return $this->get_checkout($args);
+            } else {
+                wp_die($result->response->error_message);
+            }
+        }
+        $url = $result->response->checkout_url;
+        return $url;
+    }
+
+    /**
+     * Request to api
+     * @param $args
+     * @return mixed
+     */
+    protected function get_redirect($args)
+    {
+        $conf = array(
+            'redirection' => 2,
+            'user-agent' => 'CMS Woocommerce',
+            'headers' => array("Content-type" => "application/json;charset=UTF-8"),
+            'body' => json_encode($args)
+        );
+
+        try {
+            $response = wp_remote_post($this->liveurl, $conf);
+
+            var_dump($response);exit;
+            if (is_wp_error($response))
+                throw new Exception($response->get_error_message());
+
+            $response_code = wp_remote_retrieve_response_code($response);
+
+            if ($response_code != 200)
+                throw new Exception("Frisbee API return code is $response_code");
+
+            $result = json_decode($response['body']);
+        } catch (Exception $e) {
+            $error = '<p>' . __("There has been a critical error on your website.") . '</p>';
+            $error .= '<p>' . $e->getMessage() . '</p>';
+
+            wp_die($error, __('Error'), array('response' => '500'));
+        }
+
+        if ($result->response->response_status == 'failure') {
+            if ($result->response->error_code == 1013 && !$this->checkPreOrders($args['order_id'], true)) {
+                $args['order_id'] = $args['order_id'] . self::ORDER_SEPARATOR . time();
+                unset($args['signature']);
+                $args['signature'] = $this->getSignature($args, $this->salt);
+                return $this->get_redirect($args);
             } else {
                 wp_die($result->response->error_message);
             }
