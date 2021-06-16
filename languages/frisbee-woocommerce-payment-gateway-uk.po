@@ -103,9 +103,9 @@ msgstr "Показувати MasterCard & Visa логотипи"
 
 #: woocommerce-fondy.php:266
 msgid ""
-"Show the MasterCard & Visa logo in the payment method section for the user"
+"Show the logo in the payment method section for the user"
 msgstr ""
-"Показувати логотип MasterCard & Visa в розділі способу оплати для користувача"
+"Показувати логотип в розділі способу оплати для користувача"
 
 #: woocommerce-fondy.php:268
 msgid "Tick to show \"fondy\" logo"

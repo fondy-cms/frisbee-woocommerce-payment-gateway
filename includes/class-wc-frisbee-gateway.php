@@ -257,7 +257,7 @@ class WC_frisbee extends WC_Payment_Gateway
             'showlogo' => array(
                 'title' => __('Show MasterCard & Visa logos', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('Show the MasterCard & Visa logo in the payment method section for the user', 'frisbee-woocommerce-payment-gateway'),
+                'label' => __('Show the logo in the payment method section for the user', 'frisbee-woocommerce-payment-gateway'),
                 'default' => 'yes',
                 'description' => __('Tick to show "frisbee" logo', 'frisbee-woocommerce-payment-gateway'),
                 'desc_tip' => true

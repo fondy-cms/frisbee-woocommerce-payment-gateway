@@ -91,7 +91,7 @@ msgstr ""
 
 #: woocommerce-fondy.php:266
 msgid ""
-"Show the MasterCard & Visa logo in the payment method section for the user"
+"Show the logo in the payment method section for the user"
 msgstr ""
 
 #: woocommerce-fondy.php:268
