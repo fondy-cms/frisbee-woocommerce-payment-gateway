@@ -262,13 +262,13 @@ class WC_frisbee extends WC_Payment_Gateway
                 'description' => __('Tick to show "frisbee" logo', 'frisbee-woocommerce-payment-gateway'),
                 'desc_tip' => true
             ),
-            'payment_type' => array(
-                'title' => __('Payment type', 'frisbee-woocommerce-payment-gateway'),
-                'type' => 'select',
-                'options' => $this->frisbee_get_payment_type(),
-                'description' => __('Payment type', 'frisbee-woocommerce-payment-gateway'),
-                'desc_tip' => true
-            ),
+            //'payment_type' => array(
+            //    'title' => __('Payment type', 'frisbee-woocommerce-payment-gateway'),
+            //    'type' => 'select',
+            //    'options' => $this->frisbee_get_payment_type(),
+            //    'description' => __('Payment type', 'frisbee-woocommerce-payment-gateway'),
+            //    'desc_tip' => true
+            //),
             'calendar' => array(
                 'title' => __('Show calendar on checkout', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'checkbox',
@@ -519,12 +519,11 @@ class WC_frisbee extends WC_Payment_Gateway
         $frisbee_args['server_callback_url'] = 'https://webhook.site/4581cafb-8ee8-4dfd-9c53-fab76fbcbba9';
         $frisbee_args['signature'] = $this->getSignature($frisbee_args, $this->salt);
 
-        $url = $this->get_redirect_form($frisbee_args);
+        echo $this->get_redirect_form($frisbee_args);
         $out = '';
         $url = WC()->session->get('session_token_' . $this->merchant_id . '_' . $order_id);
         if (empty($url)) {
-            $url = $this->get_redirect_form($frisbee_args);
-            WC()->session->set('session_token_' . $this->merchant_id . '_' . $order_id, $url);
+            echo $this->get_redirect_form($frisbee_args);
         }
         if ($this->page_mode == 'no') {
             $out .= '<a class="button alt f-custom-button" href="' . $url . '" id="submit_frisbee_payment_form">' . __('Pay via Frisbee', 'frisbee-woocommerce-payment-gateway') . '</a>';
@@ -716,6 +715,86 @@ class WC_frisbee extends WC_Payment_Gateway
             }
         } catch (Exception $e) {
             return new WP_Error('error', __($e->getMessage(), 'frisbee-woocommerce-payment-gateway'));
+        }
+    }
+
+    /**
+     * @param int $order_id
+     * @param bool $must_be_logged_in
+     * @return array|string
+     */
+    function process_payment($order_id, $must_be_logged_in = false)
+    {
+        global $woocommerce;
+        if ( $must_be_logged_in && get_current_user_id() === 0 ) {
+            wc_add_notice( __( 'You must be logged in.', 'frisbee-woocommerce-payment-gateway' ), 'error' );
+            return array(
+                'result'   => 'fail',
+                'redirect' => $woocommerce->cart->get_checkout_url()
+            );
+        }
+
+        $order = new WC_Order($order_id);
+
+        if (version_compare(WOOCOMMERCE_VERSION, '2.1.0', '>=')) {
+            /* 2.1.0 */
+            $checkout_payment_url = $order->get_checkout_payment_url(true);
+        } else {
+            /* 2.0.0 */
+            $checkout_payment_url = get_permalink(get_option('woocommerce_pay_page_id'));
+        }
+        if (!$this->is_subscription($order_id)) {
+            $redirect = add_query_arg('order_pay', $order_id, $checkout_payment_url);
+        } else {
+            $redirect = add_query_arg(array(
+                'order_pay' => $order_id,
+                'is_subscription' => true
+            ), $checkout_payment_url);
+        }
+        if ($this->on_checkout_page == 'yes') {
+            $amount = round($order->get_total() * 100);
+            $frisbee_args = array(
+                'order_id' => $this->getUniqueId($order_id),
+                'merchant_id' => esc_attr($this->merchant_id),
+                'amount' => $amount,
+                'order_desc' => $this->getProductInfo($order_id),
+                'currency' => esc_attr(get_woocommerce_currency()),
+                'server_callback_url' => $this->getCallbackUrl() . '&is_callback=true',
+                'response_url' => $this->getCallbackUrl(),
+                'lang' => esc_attr($this->getLanguage()),
+                'sender_email' => esc_attr($this->getEmail($order))
+            );
+            if ($this->checkPreOrders($order_id)) {
+                $frisbee_args['preauth'] = 'Y';
+            }
+            if ($this->is_subscription($order_id)) {
+                $frisbee_args['required_rectoken'] = 'Y';
+                if ((int) $amount === 0) {
+                    $order->add_order_note( __('Payment free trial verification', 'frisbee-woocommerce-payment-gateway') );
+                    $frisbee_args['verification'] = 'Y';
+                    $frisbee_args['amount'] = 1;
+                }
+            }
+
+            $frisbee_args['signature'] = $this->getSignature($frisbee_args, $this->salt);
+            $token = WC()->session->get('session_token_' . md5($this->merchant_id . '_' . $order_id . '_' . $frisbee_args['amount'] . '_' . $frisbee_args['currency']));
+
+            if (empty($token)) {
+                $token = $this->get_token($frisbee_args);
+                WC()->session->set('session_token_' . md5($this->merchant_id . '_' . $order_id . '_' . $frisbee_args['amount'] . '_' . $frisbee_args['currency']), $token);
+            }
+
+            if ($token['result'] === 'success') {
+                return $token;
+            } else {
+                wp_send_json($token);
+            }
+
+        } else {
+            return array(
+                'result' => 'success',
+                'redirect' => $redirect
+            );
         }
     }
 
