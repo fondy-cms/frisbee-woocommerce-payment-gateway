@@ -322,5 +322,5 @@ msgstr "frisbee - Unified Payment Platform"
 msgid "https://frisbee.eu/"
 msgstr "https://frisbee.ru/"
 
-msgid "Buy now pay later with Frisbee"
+msgid "Buy now pay later"
 msgstr "Купи сейчас, плати потом"

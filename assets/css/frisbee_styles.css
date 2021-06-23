@@ -1,0 +1,9 @@
+.payment_method_frisbee label {
+    display: inline-flex !important;
+}
+
+.payment_method_frisbee img {
+    height:12px;
+    margin-top: 7px;
+    margin-left: 7px;
+}

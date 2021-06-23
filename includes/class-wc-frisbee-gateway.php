@@ -54,7 +54,7 @@ class WC_frisbee extends WC_Payment_Gateway
         $this->init_form_fields();
         $this->init_settings();
 
-        $this->title = __('Buy now pay later with Frisbee', self::DOMAIN);
+        $this->title = __('Buy now pay later', self::DOMAIN);
         $this->test_mode = $this->get_option('test_mode');
         $this->calendar = $this->get_option('calendar');
         $this->redirect_page_id = $this->get_option('redirect_page_id');
@@ -147,7 +147,6 @@ class WC_frisbee extends WC_Payment_Gateway
     {
         $icon =
             '<img 
-                    style="height:12px; margin-top: 7px"
                     src="'  . FRISBEE_BASE_PATH . 'assets/img/frisbee.png' . '" 
                     alt="Frisbee" />';
         if ($this->get_option('showlogo') == "yes") {
@@ -189,25 +188,6 @@ class WC_frisbee extends WC_Payment_Gateway
     {
         if (is_checkout()) {
             wp_enqueue_style('frisbee-checkout', FRISBEE_BASE_PATH . 'assets/css/frisbee_styles.css');
-            if (isset($this->on_checkout_page) and $this->on_checkout_page == 'yes') {
-                wp_enqueue_script('frisbee_pay_v2', 'https://unpkg.com/ipsp-js-sdk@latest/dist/checkout.min.js', array('jquery'), null, true);
-                wp_enqueue_script('frisbee_pay_v2_woocom', FRISBEE_BASE_PATH . 'assets/js/frisbee.js', array('frisbee_pay_v2'), '2.4.9', true);
-                wp_enqueue_script('frisbee_pay_v2_card', FRISBEE_BASE_PATH . 'assets/js/payform.min.js', array('frisbee_pay_v2_woocom'), '2.4.9', true);
-                if (isset($this->force_lang) and $this->force_lang == 'yes') {
-                    $endpoint = new WC_AJAX();
-                    $endpoint = $endpoint::get_endpoint('checkout');
-                } else {
-                    $endpoint = admin_url('admin-ajax.php');
-                }
-                wp_localize_script('frisbee_pay_v2_woocom', 'frisbee_info',
-                    array(
-                        'url' => $endpoint,
-                        'nonce' => wp_create_nonce('frisbee-submit-nonce')
-                    )
-                );
-            } else {
-                wp_enqueue_script('frisbee_pay', '//api.fondy.eu/static_common/v1/checkout/ipsp.js', array(), null, false);
-            }
         }
     }
 
