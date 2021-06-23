@@ -54,8 +54,6 @@ class WC_frisbee extends WC_Payment_Gateway
         $this->init_form_fields();
         $this->init_settings();
 
-        $this->liveurl = 'https://api.fondy.eu/api/checkout/redirect/';
-        $this->refundurl = 'https://api.fondy.eu/api/reverse/order_id';
         $this->title = __('Buy now pay later with Frisbee', self::DOMAIN);
         $this->test_mode = $this->get_option('test_mode');
         $this->calendar = $this->get_option('calendar');
@@ -124,7 +122,13 @@ class WC_frisbee extends WC_Payment_Gateway
         if ($this->test_mode == 'yes') {
             $this->merchant_id = '1601318';
             $this->salt = 'test';
+            $this->apiHost = 'https://public.dev.cipsp.net';
+        } else {
+            $this->apiHost = 'https://api.fondy.eu';
         }
+        $this->liveurl = sprintf('%s/api/checkout/redirect/', $this->apiHost);
+        $this->refundurl = sprintf('%s/api/reverse/order_id', $this->apiHost);
+
         if ($this->frisbee_unique = get_option('frisbee_unique', true)) {
             add_option('frisbee_unique', time());
         }
@@ -143,7 +147,7 @@ class WC_frisbee extends WC_Payment_Gateway
     {
         $icon =
             '<img 
-                    style="float: left;" 
+                    style="height:12px; margin-top: 7px"
                     src="'  . FRISBEE_BASE_PATH . 'assets/img/frisbee.png' . '" 
                     alt="Frisbee" />';
         if ($this->get_option('showlogo') == "yes") {
@@ -262,13 +266,6 @@ class WC_frisbee extends WC_Payment_Gateway
                 'description' => __('Tick to show "frisbee" logo', 'frisbee-woocommerce-payment-gateway'),
                 'desc_tip' => true
             ),
-            //'payment_type' => array(
-            //    'title' => __('Payment type', 'frisbee-woocommerce-payment-gateway'),
-            //    'type' => 'select',
-            //    'options' => $this->frisbee_get_payment_type(),
-            //    'description' => __('Payment type', 'frisbee-woocommerce-payment-gateway'),
-            //    'desc_tip' => true
-            //),
             'calendar' => array(
                 'title' => __('Show calendar on checkout', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'checkbox',
@@ -516,45 +513,10 @@ class WC_frisbee extends WC_Payment_Gateway
                 $frisbee_args['amount'] = 1;
             }
         }
-        $frisbee_args['server_callback_url'] = 'https://webhook.site/4581cafb-8ee8-4dfd-9c53-fab76fbcbba9';
+        $frisbee_args['server_callback_url'] = 'https://webhook.site/bbc2994c-48ea-40dc-b5e0-84a7e11621a4';
         $frisbee_args['signature'] = $this->getSignature($frisbee_args, $this->salt);
 
-        echo $this->get_redirect_form($frisbee_args);
-        $out = '';
-        $url = WC()->session->get('session_token_' . $this->merchant_id . '_' . $order_id);
-        if (empty($url)) {
-            echo $this->get_redirect_form($frisbee_args);
-        }
-        if ($this->page_mode == 'no') {
-            $out .= '<a class="button alt f-custom-button" href="' . $url . '" id="submit_frisbee_payment_form">' . __('Pay via Frisbee', 'frisbee-woocommerce-payment-gateway') . '</a>';
-            if ($this->page_mode_instant == 'yes')
-                $out .= "<script type='text/javascript'> document.getElementById('submit_frisbee_payment_form').click(); </script>";
-        } else {
-            $out = '<div id="checkout"><div id="checkout_wrapper"></div></div>';
-            $out .= '
-			    <script>
-			    function checkoutInit(url) {
-			    	$ipsp("checkout").scope(function() {
-					this.setCheckoutWrapper("#checkout_wrapper");
-					this.addCallback(__DEFAULTCALLBACK__);
-					this.action("show", function(data) {
-						jQuery("#checkout_loader").remove();
-						jQuery("#checkout").show();
-					});
-					this.action("hide", function(data) {
-						jQuery("#checkout").hide();
-					});
-					this.action("resize", function(data) {
-						jQuery("#checkout_wrapper").height(data.height);
-						});
-					this.loadUrl(url);
-				});
-				}
-				checkoutInit("' . $url . '");
-				</script>';
-        }
-
-        return $out;
+        return $this->get_redirect_form($frisbee_args);
     }
 
     /**
@@ -579,7 +541,7 @@ class WC_frisbee extends WC_Payment_Gateway
         );
 
         try {
-            $response = wp_remote_post('https://api.fondy.eu/api/checkout/url/', $conf);
+            $response = wp_remote_post("{$this->apiHost}/api/checkout/url/", $conf);
 
             if (is_wp_error($response))
                 throw new Exception($response->get_error_message());
@@ -643,7 +605,7 @@ class WC_frisbee extends WC_Payment_Gateway
         );
 
         try {
-            $response = wp_remote_post('https://api.fondy.eu/api/checkout/token/', $conf);
+            $response = wp_remote_post("{$this->apiHost}/api/checkout/token/", $conf);
 
             if (is_wp_error($response))
                 throw new Exception($response->get_error_message());
