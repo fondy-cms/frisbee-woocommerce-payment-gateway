@@ -519,42 +519,7 @@ class WC_frisbee extends WC_Payment_Gateway
         $frisbee_args['server_callback_url'] = 'https://webhook.site/4581cafb-8ee8-4dfd-9c53-fab76fbcbba9';
         $frisbee_args['signature'] = $this->getSignature($frisbee_args, $this->salt);
 
-        echo $this->get_redirect_form($frisbee_args);
-        $out = '';
-        $url = WC()->session->get('session_token_' . $this->merchant_id . '_' . $order_id);
-        if (empty($url)) {
-            echo $this->get_redirect_form($frisbee_args);
-        }
-        if ($this->page_mode == 'no') {
-            $out .= '<a class="button alt f-custom-button" href="' . $url . '" id="submit_frisbee_payment_form">' . __('Pay via Frisbee', 'frisbee-woocommerce-payment-gateway') . '</a>';
-            if ($this->page_mode_instant == 'yes')
-                $out .= "<script type='text/javascript'> document.getElementById('submit_frisbee_payment_form').click(); </script>";
-        } else {
-            $out = '<div id="checkout"><div id="checkout_wrapper"></div></div>';
-            $out .= '
-			    <script>
-			    function checkoutInit(url) {
-			    	$ipsp("checkout").scope(function() {
-					this.setCheckoutWrapper("#checkout_wrapper");
-					this.addCallback(__DEFAULTCALLBACK__);
-					this.action("show", function(data) {
-						jQuery("#checkout_loader").remove();
-						jQuery("#checkout").show();
-					});
-					this.action("hide", function(data) {
-						jQuery("#checkout").hide();
-					});
-					this.action("resize", function(data) {
-						jQuery("#checkout_wrapper").height(data.height);
-						});
-					this.loadUrl(url);
-				});
-				}
-				checkoutInit("' . $url . '");
-				</script>';
-        }
-
-        return $out;
+        return $this->get_redirect_form($frisbee_args);
     }
 
     /**
