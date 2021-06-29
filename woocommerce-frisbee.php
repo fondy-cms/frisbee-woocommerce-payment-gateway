@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: WooCommerce - Frisbee payment gateway
+Plugin Name: WooCommerce - Frisbee | Buy Now, Pay Later
 Plugin URI: https://fondy.eu
-Description: Frisbee Payment Gateway for WooCommerce.
-Version: 2.6.10
-Author: FONDY - Unified Payment Platform
-Author URI: https://fondy.eu/
+Description: Frisbee payments plugin for WooCommerce.
+Version: 1.0.0
+Author: Frisbee | Buy Now, Pay Later
+Author URI: https://frisbee.ua/
 Domain Path: /languages
 Text Domain: frisbee-woocommerce-payment-gateway
 License: GPLv2 or later

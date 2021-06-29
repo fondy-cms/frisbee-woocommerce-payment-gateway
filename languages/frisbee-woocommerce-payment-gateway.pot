@@ -1,7 +1,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: WooCommerce - Frisbee payment gateway\n"
+"Project-Id-Version: WooCommerce - Frisbee | Buy Now, Pay Later\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-29 13:55+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -16,7 +16,7 @@ msgstr ""
 "X-Loco-Version: 2.2.1; wp-5.1.1"
 
 #: woocommerce-frisbee.php:84 woocommerce-frisbee.php:372
-msgid "Payment gateway"
+msgid "Buy now, pay later service"
 msgstr ""
 
 #: woocommerce-frisbee.php:180
@@ -78,7 +78,7 @@ msgid "Merchant ID"
 msgstr ""
 
 #: woocommerce-frisbee.php:258
-msgid "Merchant secretkey"
+msgid "Payment key"
 msgstr ""
 
 #: woocommerce-frisbee.php:260
@@ -86,7 +86,7 @@ msgid "Given to Merchant by frisbee"
 msgstr ""
 
 #: woocommerce-frisbee.php:264
-msgid "Show MasterCard & Visa logos"
+msgid "Show Frisbee logo"
 msgstr ""
 
 #: woocommerce-frisbee.php:266
@@ -135,7 +135,7 @@ msgid "URL of success page"
 msgstr ""
 
 #: woocommerce-frisbee.php:326
-msgid "Payment completed order status"
+msgid "Successful payment order status"
 msgstr ""
 
 #: woocommerce-frisbee.php:330
@@ -163,7 +163,7 @@ msgid "Default status"
 msgstr ""
 
 #: woocommerce-frisbee.php:371
-msgid "Frisbee.eu"
+msgid "frisbee.eu"
 msgstr ""
 
 #: woocommerce-frisbee.php:394
@@ -289,11 +289,11 @@ msgid "Settings"
 msgstr ""
 
 #. Name of the plugin
-msgid "WooCommerce - Frisbee payment gateway"
+msgid "WooCommerce - Frisbee | Buy Now, Pay Later"
 msgstr ""
 
 #. Description of the plugin
-msgid "Frisbee Payment Gateway for WooCommerce."
+msgid "Frisbee payments plugin for WooCommerce."
 msgstr ""
 
 #. URI of the plugin

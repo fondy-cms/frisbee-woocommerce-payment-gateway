@@ -19,10 +19,6 @@ class WC_frisbee extends WC_Payment_Gateway
     const SIGNATURE_SEPARATOR = '|';
     const ORDER_SEPARATOR = ":";
     const DOMAIN = 'frisbee-woocommerce-payment-gateway';
-    const LOCALES = [
-        'ru_RU' => 'Russia',
-        'uk' => 'Ukraine',
-    ];
 
     public $merchant_id;
     public $salt;
@@ -49,7 +45,7 @@ class WC_frisbee extends WC_Payment_Gateway
     {
         $this->id = 'frisbee';
         $this->method_title = 'FRISBEE';
-        $this->method_description = __('Payment gateway', 'frisbee-woocommerce-payment-gateway');
+        $this->method_description = __('Buy now, pay later service', self::DOMAIN);
         $this->has_fields = false;
         $this->init_form_fields();
         $this->init_settings();
@@ -119,12 +115,11 @@ class WC_frisbee extends WC_Payment_Gateway
         if (isset($this->on_checkout_page) and $this->on_checkout_page == 'yes') {
             add_filter('woocommerce_order_button_html', array(&$this, 'custom_order_button_html'));
         }
+        $this->apiHost = 'https://api.fondy.eu';
         if ($this->test_mode == 'yes') {
             $this->merchant_id = '1601318';
             $this->salt = 'test';
             $this->apiHost = 'https://public.dev.cipsp.net';
-        } else {
-            $this->apiHost = 'https://api.fondy.eu';
         }
         $this->liveurl = sprintf('%s/api/checkout/redirect/', $this->apiHost);
         $this->refundurl = sprintf('%s/api/reverse/order_id', $this->apiHost);
@@ -134,9 +129,6 @@ class WC_frisbee extends WC_Payment_Gateway
         }
         add_action('woocommerce_receipt_frisbee', array(&$this, 'receipt_page'));
         add_action('wp_enqueue_scripts', array($this, 'frisbee_checkout_scripts'));
-        if (class_exists('WC_Pre_Orders_Order')) {
-            add_action('wc_pre_orders_process_pre_order_completion_payment_' . $this->id, array($this, 'process_pre_order_payments'));
-        }
     }
 
     /**
@@ -215,51 +207,35 @@ class WC_frisbee extends WC_Payment_Gateway
             'title' => array(
                 'title' => __('Title:', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'text',
-                'default' => __('Frisbee Online Payments', 'frisbee-woocommerce-payment-gateway'),
+                'default' => __('Buy now, pay later with Frisbee', 'frisbee-woocommerce-payment-gateway'),
                 'description' => __('This controls the title which the user sees during checkout.', 'frisbee-woocommerce-payment-gateway'),
                 'desc_tip' => true
             ),
             'description' => array(
                 'title' => __('Description:', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'textarea',
-                'default' => __('Pay securely by Credit or Debit Card or Internet Banking through frisbee service.', 'frisbee-woocommerce-payment-gateway'),
+                'default' => __('After clicking "Place order", you will be redirected to the Frisbee service to complete your purchase.', 'frisbee-woocommerce-payment-gateway'),
                 'description' => __('This controls the description which the user sees during checkout.', 'frisbee-woocommerce-payment-gateway'),
                 'desc_tip' => true
             ),
             'merchant_id' => array(
-                'title' => __('Merchant ID', 'frisbee-woocommerce-payment-gateway'),
+                'title' => __('Merchant ID:', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'text',
-                'description' => __('Given to Merchant by frisbee'),
+                'description' => __('Ask Frisbee support about your ID.'),
                 'desc_tip' => true
             ),
             'salt' => array(
-                'title' => __('Merchant secretkey', 'frisbee-woocommerce-payment-gateway'),
+                'title' => __('Payment key:', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'text',
                 'description' => __('Given to Merchant by frisbee', 'frisbee-woocommerce-payment-gateway'),
                 'desc_tip' => true
             ),
             'showlogo' => array(
-                'title' => __('Show MasterCard & Visa logos', 'frisbee-woocommerce-payment-gateway'),
+                'title' => __('Show Frisbee logo', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'checkbox',
                 'label' => __('Show the logo in the payment method section for the user', 'frisbee-woocommerce-payment-gateway'),
                 'default' => 'yes',
                 'description' => __('Tick to show "frisbee" logo', 'frisbee-woocommerce-payment-gateway'),
-                'desc_tip' => true
-            ),
-            'calendar' => array(
-                'title' => __('Show calendar on checkout', 'frisbee-woocommerce-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('Show recurring payment calendar on checkout', 'frisbee-woocommerce-payment-gateway'),
-                'default' => 'no',
-                'description' => __('Tick to show show recurring payment calendar on checkout', 'frisbee-woocommerce-payment-gateway'),
-                'desc_tip' => true
-            ),
-            'force_lang' => array(
-                'title' => __('Enable force detect lang', 'frisbee-woocommerce-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('Enable detecting site lang if it used', 'frisbee-woocommerce-payment-gateway'),
-                'default' => 'no',
-                'description' => __('Enable detecting site lang if it used', 'frisbee-woocommerce-payment-gateway'),
                 'desc_tip' => true
             ),
             'redirect_page_id' => array(
@@ -270,25 +246,22 @@ class WC_frisbee extends WC_Payment_Gateway
                 'desc_tip' => true
             ),
             'default_order_status' => array(
-                'title' => __('Payment completed order status', 'frisbee-woocommerce-payment-gateway'),
+                'title' => __('Successful payment order status', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'select',
                 'options' => $this->getPaymentOrderStatuses(),
                 'default' => 'none',
-                'description' => __('The default order status after successful payment.', 'frisbee-woocommerce-payment-gateway')
             ),
             'expired_order_status' => array(
                 'title' => __('Payment expired order status', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'select',
                 'options' => $this->getPaymentOrderStatuses(),
                 'default' => 'none',
-                'description' => __('Order status when payment was expired.', 'frisbee-woocommerce-payment-gateway')
             ),
             'declined_order_status' => array(
                 'title' => __('Payment declined order status', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'select',
                 'options' => $this->getPaymentOrderStatuses(),
                 'default' => 'none',
-                'description' => __('Order status when payment was declined.', 'frisbee-woocommerce-payment-gateway')
             ),
         );
     }
@@ -316,73 +289,11 @@ class WC_frisbee extends WC_Payment_Gateway
     public function admin_options()
     {
         echo '<h3>' . __('Frisbee', 'frisbee-woocommerce-payment-gateway') . '</h3>';
-        echo '<p>' . __('Payment gateway', 'frisbee-woocommerce-payment-gateway') . '</p>';
+        echo '<p>' . __('Buy now, pay later service.', 'frisbee-woocommerce-payment-gateway') . '</p>';
         echo '<table class="form-table">';
         // Generate the HTML For the settings form.
         $this->generate_settings_html();
         echo '</table>';
-    }
-
-    /**
-     * CCard fields on generating order
-     */
-    public function payment_fields()
-    {
-        if ($this->description) {
-            echo wpautop(wptexturize($this->description));
-        }
-        if (isset($this->on_checkout_page) and $this->on_checkout_page == 'yes') {
-            ?>
-            <form autocomplete="on" class="frisbee-ccard" id="checkout_frisbee_form">
-                <input type="hidden" name="payment_system" value="card">
-                <div class="f-container">
-                    <div class="input-wrapper">
-                        <div class="input-label w-1">
-                            <?php esc_html_e('Card Number:', 'frisbee-woocommerce-payment-gateway') ?>
-                        </div>
-                        <div class="input-field w-1">
-                            <input required type="tel" name="card_number" class="input frisbee-credit-cart"
-                                   id="frisbee_ccard"
-                                   autocomplete="cc-number"
-                                   placeholder="<?php esc_html_e('XXXXXXXXXXXXXXXX', 'frisbee-woocommerce-payment-gateway') ?>"/>
-                            <div id="f_card_sep"></div>
-                        </div>
-                    </div>
-                    <div class="input-wrapper">
-                        <div class="input-label w-3-2">
-                            <?php esc_html_e('Expiry Date:', 'frisbee-woocommerce-payment-gateway') ?>
-                        </div>
-                        <div class="input-label w-4 w-rigth">
-                            <?php esc_html_e('CVV2:', 'frisbee-woocommerce-payment-gateway') ?>
-                        </div>
-                        <div class="input-field w-4">
-                            <input required type="tel" name="expiry_month" id="frisbee_expiry_month"
-                                   onkeydown="nextInput(this,event)" class="input"
-                                   maxlength="2" placeholder="MM"/>
-                        </div>
-                        <div class="input-field w-4">
-                            <input required type="tel" name="expiry_year" id="frisbee_expiry_year"
-                                   onkeydown="nextInput(this,event)" class="input"
-                                   maxlength="2" placeholder="YY"/>
-                        </div>
-                        <div class="input-field w-4 w-rigth">
-                            <input autocomplete="off" required type="tel" name="cvv2" id="frisbee_cvv2"
-                                   onkeydown="nextInput(this,event)"
-                                   class="input"
-                                   placeholder="<?php esc_html_e('XXX', 'frisbee-woocommerce-payment-gateway') ?>"/>
-                        </div>
-                    </div>
-                    <div style="display: none" class="input-wrapper stack-1">
-                        <div class="input-field w-1">
-                            <input id="submit_frisbee_checkout_form" type="submit" class="button"
-                                   value="<?php esc_html_e('Pay', 'frisbee-woocommerce-payment-gateway') ?>"/>
-                        </div>
-                    </div>
-                    <div class="error-wrapper"></div>
-                </div>
-            </form>
-            <?php
-        }
     }
 
     /**
@@ -493,7 +404,6 @@ class WC_frisbee extends WC_Payment_Gateway
                 $frisbee_args['amount'] = 1;
             }
         }
-        $frisbee_args['server_callback_url'] = 'https://webhook.site/bbc2994c-48ea-40dc-b5e0-84a7e11621a4';
         $frisbee_args['signature'] = $this->getSignature($frisbee_args, $this->salt);
 
         return $this->get_redirect_form($frisbee_args);
@@ -1039,94 +949,5 @@ class WC_frisbee extends WC_Payment_Gateway
         }
 
         return $page_list;
-    }
-
-    /**
-     * @return array
-     */
-    function frisbee_get_payment_type()
-    {
-        return array(
-            'on_checkout_page' => __('Built-in form', 'frisbee-woocommerce-payment-gateway'),
-            'page_mode' => __('In-store payment page', 'frisbee-woocommerce-payment-gateway'),
-            'page_mode_instant' => __('Redirection', 'frisbee-woocommerce-payment-gateway'),
-        );
-    }
-
-    /**
-     * Send capture request
-     * @param $args
-     * @return array
-     * */
-    protected function get_capture($args)
-    {
-        $conf = array(
-            'redirection' => 2,
-            'user-agent' => 'CMS Woocommerce',
-            'headers' => array("Content-type" => "application/json;charset=UTF-8"),
-            'body' => json_encode(array('request' => $args))
-        );
-        $response = wp_remote_post('https://api.fondy.eu/api/capture/order_id', $conf);
-        $response_code = wp_remote_retrieve_response_code($response);
-        if ($response_code != 200) {
-            $error = "Return code is {$response_code}";
-            return array('result' => 'failture', 'messages' => $error);
-        }
-        $result = json_decode($response['body'], true);
-        return array('data' => $result['response']);
-    }
-
-    /**
-     * Process capture
-     * @param $order
-     * @return WP_Error
-     */
-    public function process_pre_order_payments($order)
-    {
-        if (!$order) {
-            return new WP_Error('fallen', 'Order not found');
-        }
-        $frisbee_args = array(
-            'order_id' => $this->getUniqueId($order->get_id()),
-            'currency' => esc_attr(get_woocommerce_currency()),
-            'amount' => round($order->get_total() * 100),
-            'merchant_id' => esc_attr($this->merchant_id),
-        );
-        $frisbee_args['signature'] = $this->getSignature($frisbee_args, $this->salt);
-        $result = $this->get_capture($frisbee_args);
-        if (isset($result) && $result) {
-            if (isset($result['result']) && $result['result'] == 'failture') {
-                $order->add_order_note('Transaction ERROR:<br/> ' . $result['messages']);
-            } else {
-                if ($result['data']['response_status'] == 'success' && $result['data']['capture_status'] == 'captured') {
-                    $order->add_order_note(__('Frisbee payment successful.<br/>FRISBEE ID: ', 'frisbee-woocommerce-payment-gateway') . ' (' . $result['data']['order_id'] . ')');
-                    $order->payment_complete();
-                } else {
-                    $request_id = '<br>Request_id: ' . $result['data']['request_id'];
-                    $order->add_order_note('Transaction: ' . $result['data']['response_status'] . '  <br/> ' . $result['data']['error_message'] . $request_id);
-                }
-            }
-        }
-    }
-
-    /**
-     * Check pre order class and order status
-     * @param $order_id
-     * @param bool $withoutToken
-     * @return boolean
-     */
-    public function checkPreOrders($order_id, $withoutToken = false)
-    {
-        if (class_exists('WC_Pre_Orders_Order')
-            && WC_Pre_Orders_Order::order_contains_pre_order($order_id)) {
-            if ($withoutToken) {
-                return true;
-            } else {
-                if (WC_Pre_Orders_Order::order_requires_payment_tokenization($order_id)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

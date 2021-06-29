@@ -25,8 +25,8 @@ msgstr ""
 "X-Poedit-SearchPath-0: ../../plugins/woocommerce-oplata\n"
 
 #: woocommerce-frisbee.php:84 woocommerce-frisbee.php:372
-msgid "Payment gateway"
-msgstr "Платіжний шлюз"
+msgid "Buy now, pay later service."
+msgstr "Сервіс оплати частинами."
 
 #: woocommerce-frisbee.php:180
 msgid "Place order"
@@ -86,20 +86,23 @@ msgid "This controls the description which the user sees during checkout."
 msgstr "Опис, який бачить користувач в процесі оформлення замовлення."
 
 #: woocommerce-frisbee.php:252
-msgid "Merchant ID"
-msgstr "Merchant ID"
+msgid "Merchant ID:"
+msgstr "ID мерчанта:"
 
 #: woocommerce-frisbee.php:258
-msgid "Merchant secretkey"
-msgstr "Merchant secretkey"
+msgid "Payment key:"
+msgstr "Ключ оплати:"
 
 #: woocommerce-frisbee.php:260
-msgid "Given to Merchant by frisbee"
-msgstr "Видається мерчанту Frisbee"
+msgid "Ask Frisbee support about your ID."
+msgstr "Запитайте ваш ID у служби підтримки Frisbee."
+
+msgid "Ask Frisbee support to provide you with a key."
+msgstr "Запитайте ваш ключ оплати у служби підтримки Frisbee."
 
 #: woocommerce-frisbee.php:264
-msgid "Show MasterCard & Visa logos"
-msgstr "Показувати MasterCard & Visa логотипи"
+msgid "Show Frisbee logo"
+msgstr "Показувати Frisbee логотип"
 
 #: woocommerce-frisbee.php:266
 msgid ""
@@ -144,8 +147,8 @@ msgid "URL of success page"
 msgstr "Сторінка куди буде направлений користувач після оплати"
 
 #: woocommerce-frisbee.php:326
-msgid "Payment completed order status"
-msgstr "Статус замовлення при успішному платежі"
+msgid "Successful payment order status"
+msgstr "Статус замовлення при успішній оплаті"
 
 #: woocommerce-frisbee.php:330
 msgid "The default order status after successful payment."
@@ -153,7 +156,7 @@ msgstr "Стандартний статус замовлення при успі
 
 #: woocommerce-frisbee.php:333
 msgid "Payment expired order status"
-msgstr "Статус замовлення при сплившей оплаті"
+msgstr "Статус замовлення, якщо закінчився термін оплати"
 
 #: woocommerce-frisbee.php:337
 msgid "Order status when payment was expired."
@@ -161,7 +164,7 @@ msgstr "Зміна статусу замовлення при сплившему
 
 #: woocommerce-frisbee.php:340
 msgid "Payment declined order status"
-msgstr "Статус замовлення при відхиленому платежі"
+msgstr "Статус замовлення при відмові"
 
 #: woocommerce-frisbee.php:344
 msgid "Order status when payment was declined."
@@ -172,8 +175,8 @@ msgid "Default status"
 msgstr "Стандартний статус"
 
 #: woocommerce-frisbee.php:371
-msgid "Frisbee.eu"
-msgstr "Frisbee.eu"
+msgid "frisbee.eu"
+msgstr "frisbee.eu"
 
 #: woocommerce-frisbee.php:394
 msgid "Card Number:"
@@ -305,12 +308,12 @@ msgid "Settings"
 msgstr "Налаштування"
 
 #. Name of the plugin
-msgid "WooCommerce - Frisbee payment gateway"
-msgstr "WooCommerce - платіжний шлюз Frisbee"
+msgid "WooCommerce - Frisbee | Buy Now, Pay Later"
+msgstr "WooCommerce - Frisbee | Оплата частинами"
 
 #. Description of the plugin
-msgid "Frisbee Payment Gateway for WooCommerce."
-msgstr "Платіжний шлюз Frisbee для WooCommerce."
+msgid "Frisbee payments plugin for WooCommerce."
+msgstr "Плагін сервісу оплати частинами Frisbee для WooCommerce."
 
 #. URI of the plugin
 msgid "https://frisbee.eu"
@@ -320,9 +323,20 @@ msgstr "https://frisbee.ua/"
 msgid "Frisbee - Unified Payment Platform"
 msgstr "Frisbee - Unified Payment Platform"
 
-#. Author URI of the plugin
-msgid "https://frisbee.eu/"
-msgstr "https://frisbee.ua/"
-
 msgid "Buy now pay later"
+msgstr "Купуй зараз, плати потім"
+
+msgid "Frisbee | Buy Now, Pay Later"
+msgstr "Frisbee | Оплата частинами"
+
+msgid "Buy now, pay later with Frisbee"
+msgstr "Оплатити частинами через Frisbee"
+
+msgid "After clicking \"Place order\", you will be redirected to the Frisbee service to complete your purchase."
+msgstr "Після натискання кнопки \"Розмістити замовлення\" ви будете перенаправлені на сторінку сервісу Frisbee для завершення покупки."
+
+msgid "Buy now, pay later service"
+msgstr "Сервіс оплати частинами"
+
+msgid "Buy now, pay later"
 msgstr "Купуй зараз, плати потім"
