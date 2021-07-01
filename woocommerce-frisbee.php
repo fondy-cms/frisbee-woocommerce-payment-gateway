@@ -17,13 +17,15 @@ WC tested up to: 4.7.1
 defined( 'ABSPATH' ) or exit;
 define( 'FRISBEE_BASE_PATH' ,  plugin_dir_url( __FILE__ ) );
 if ( ! class_exists( 'WC_PaymentFrisbee' ) ) :
-    class WC_PaymentFrisbee {
+    class WC_PaymentFrisbee
+    {
         private static $instance;
 
         /**
          * @return WC_PaymentFrisbee
          */
-        public static function get_instance() {
+        public static function get_instance()
+        {
             if ( null === self::$instance ) {
                 self::$instance = new self();
             }
@@ -34,14 +36,17 @@ if ( ! class_exists( 'WC_PaymentFrisbee' ) ) :
         /**
          * WC_PaymentFrisbee constructor.
          */
-        protected function __construct() {
+        protected function __construct()
+        {
             add_action( 'plugins_loaded', array( $this, 'init' ) );
+            add_action( 'woocommerce_api_frisbee_webhook' , array( $this, 'webhook' ) );
         }
 
         /**
          * init frisbee
          */
-        public function init() {
+        public function init()
+        {
             if ( self::check_environment() ) {
                 return;
             }
@@ -52,23 +57,21 @@ if ( ! class_exists( 'WC_PaymentFrisbee' ) ) :
         /**
          * init frisbee
          */
-        public function init_frisbee() {
+        public function init_frisbee()
+        {
             require_once( dirname( __FILE__ ) . '/includes/class-wc-frisbee-gateway.php' );
             load_plugin_textdomain( "frisbee-woocommerce-payment-gateway", false, basename( dirname( __FILE__ )) . '/languages' );
             add_filter( 'woocommerce_payment_gateways', array( $this, 'woocommerce_add_frisbee_gateway' ) );
             add_action('wp_ajax_nopriv_generate_ajax_order_frisbee_info', array('WC_frisbee', 'generate_ajax_order_frisbee_info' ), 99);
             add_action('wp_ajax_generate_ajax_order_frisbee_info', array('WC_frisbee', 'generate_ajax_order_frisbee_info'), 99);
-            if ( class_exists( 'WC_Subscriptions_Order' ) && function_exists( 'wcs_create_renewal_order' ) ) {
-                $this->subscription_support_enabled = true;
-                require_once( dirname( __FILE__ ) . '/includes/wc-frisbee-subscriptions.php' );
-            }
         }
 
         /**
          * Checks the environment for compatibility problems.  Returns a string with the first incompatibility
          * found or false if the environment has no problems.
          */
-        static function check_environment() {
+        static function check_environment()
+        {
             if ( version_compare( phpversion(), '5.4.0', '<' ) ) {
                 $message = __( ' The minimum PHP version required for Frisbee is %1$s. You are running %2$s.', 'woocommerce-frisbee' );
 
@@ -87,7 +90,9 @@ if ( ! class_exists( 'WC_PaymentFrisbee' ) ) :
 
             return false;
         }
-        public function plugin_action_links( $links ) {
+
+        public function plugin_action_links( $links )
+        {
             $plugin_links = array(
                 '<a href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=frisbee' ) . '">' . __( 'Settings', 'woocommerce-frisbee' ) . '</a>',
             );
@@ -100,9 +105,22 @@ if ( ! class_exists( 'WC_PaymentFrisbee' ) ) :
          * @param $methods
          * @return array
          */
-        public function woocommerce_add_frisbee_gateway( $methods ) {
+        public function woocommerce_add_frisbee_gateway( $methods )
+        {
             $methods[] = 'WC_frisbee';
             return $methods;
+        }
+
+        public function webhook()
+        {
+            $wcFrisbee = new WC_frisbee();
+
+            if (isset($_REQUEST['order_id']) && $wcFrisbee->isPaymentValid($_REQUEST)) {
+                $orderId = $wcFrisbee->getOrderId($_REQUEST);
+                $order = new WC_Order($orderId);
+                $order->payment_complete();
+                wc_reduce_stock_levels($orderId);
+            }
         }
     }
 

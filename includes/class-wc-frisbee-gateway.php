@@ -380,30 +380,14 @@ class WC_frisbee extends WC_Payment_Gateway
             'order_desc' => $this->getProductInfo($order_id),
             'amount' => $amount,
             'currency' => get_woocommerce_currency(),
-            'server_callback_url' => $this->getCallbackUrl() . '&is_callback=true',
-            'response_url' => $this->getCallbackUrl(),
+            'server_callback_url' => $this->getCallbackUrl(),
+            'response_url' => $order->get_checkout_order_received_url(),
             'lang' => $this->getLanguage(),
             'sender_email' => $this->getEmail($order),
             'payment_systems' => 'frisbee',
             'default_payment_system' => 'frisbee',
         );
-        if ($this->calendar == 'yes') {
-            $frisbee_args['required_rectoken'] = 'Y';
-            $frisbee_args['subscription'] = 'Y';
-            $frisbee_args['subscription_callback_url'] = $this->getCallbackUrl() . '&is_callback=true';
-        }
 
-        if ($this->checkPreOrders($order_id)) {
-            $frisbee_args['preauth'] = 'Y';
-        }
-        if ($this->is_subscription($order_id)) {
-            $frisbee_args['required_rectoken'] = 'Y';
-            if ((int) $amount === 0) {
-                $order->add_order_note( __('Payment free trial verification', 'frisbee-woocommerce-payment-gateway') );
-                $frisbee_args['verification'] = 'Y';
-                $frisbee_args['amount'] = 1;
-            }
-        }
         $frisbee_args['signature'] = $this->getSignature($frisbee_args, $this->salt);
 
         return $this->get_redirect_form($frisbee_args);
@@ -611,8 +595,8 @@ class WC_frisbee extends WC_Payment_Gateway
                 'amount' => $amount,
                 'order_desc' => $this->getProductInfo($order_id),
                 'currency' => esc_attr(get_woocommerce_currency()),
-                'server_callback_url' => $this->getCallbackUrl() . '&is_callback=true',
-                'response_url' => $this->getCallbackUrl(),
+                'server_callback_url' => $this->getCallbackUrl(),
+                'response_url' => $order->get_checkout_order_received_url(),
                 'lang' => esc_attr($this->getLanguage()),
                 'sender_email' => esc_attr($this->getEmail($order))
             );
@@ -654,7 +638,7 @@ class WC_frisbee extends WC_Payment_Gateway
      * Answer Url
      * @return string
      */
-    private function getCallbackUrl()
+    public function getCallbackUrl()
     {
         if (isset($this->force_lang) and $this->force_lang == 'yes') {
             $site_url = get_home_url();
@@ -664,8 +648,7 @@ class WC_frisbee extends WC_Payment_Gateway
 
         $redirect_url = ($this->redirect_page_id == "" || $this->redirect_page_id == 0) ? $site_url : get_permalink($this->redirect_page_id);
 
-        //For wooCoomerce 2.0
-        return add_query_arg('wc-api', get_class($this), $redirect_url);
+        return add_query_arg('wc-api', 'frisbee_webhook', $redirect_url) . '&is_callback=true';
     }
 
     /**
@@ -695,16 +678,23 @@ class WC_frisbee extends WC_Payment_Gateway
         return $email;
     }
 
+    public function getOrderId($data)
+    {
+        list($orderId,) = explode(self::ORDER_SEPARATOR, $data['order_id']);
+
+        return $orderId;
+    }
+
     /**
-     * Validation responce
+     * Validation response
      * @param $response
      * @return bool
      *
      */
-    protected function isPaymentValid($response)
+    public function isPaymentValid($response)
     {
         global $woocommerce;
-        list($orderId,) = explode(self::ORDER_SEPARATOR, $response['order_id']);
+        $orderId = $this->getOrderId($response);
         $order = new WC_Order($orderId);
         $total = round($order->get_total() * 100);
         if ($order === false) {
