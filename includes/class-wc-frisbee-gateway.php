@@ -50,7 +50,7 @@ class WC_frisbee extends WC_Payment_Gateway
         $this->init_form_fields();
         $this->init_settings();
 
-        $this->title = __('Buy now pay later', self::DOMAIN);
+        $this->title = $this->get_option('title') ?: __('Buy now pay later', self::DOMAIN);
         $this->test_mode = $this->get_option('test_mode');
         $this->calendar = $this->get_option('calendar');
         $this->redirect_page_id = $this->get_option('redirect_page_id');
