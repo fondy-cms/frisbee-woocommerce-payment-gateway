@@ -50,7 +50,7 @@ class WC_frisbee extends WC_Payment_Gateway
         $this->init_form_fields();
         $this->init_settings();
 
-        $this->title = __('Buy now pay later', self::DOMAIN);
+        $this->title = $this->getTitle();
         $this->test_mode = $this->get_option('test_mode');
         $this->calendar = $this->get_option('calendar');
         $this->redirect_page_id = $this->get_option('redirect_page_id');
@@ -141,10 +141,35 @@ class WC_frisbee extends WC_Payment_Gateway
             '<img 
                     src="'  . FRISBEE_BASE_PATH . 'assets/img/frisbee.png' . '" 
                     alt="Frisbee" />';
-        if ($this->get_option('showlogo') == "yes") {
+        if ($this->showLogo()) {
             return apply_filters('woocommerce_gateway_icon', $icon, $this->id);
         } else {
             return false;
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function showLogo()
+    {
+        return $this->get_option('showlogo') == "yes";
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        $title = $this->get_option('title');
+        $defaultTitle = __('Buy now pay later', self::DOMAIN);
+
+        if ($title) {
+            return $title;
+        } elseif ($this->showLogo()) {
+            return trim(str_ireplace('Frisbee', '', $defaultTitle));
+        } else {
+            return $defaultTitle;
         }
     }
 
@@ -262,6 +287,12 @@ class WC_frisbee extends WC_Payment_Gateway
                 'type' => 'select',
                 'options' => $this->getPaymentOrderStatuses(),
                 'default' => 'none',
+            ),
+            'save_data_after_uninstall' => array(
+                'title' => __('Enable/Disable', 'frisbee-woocommerce-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Save settings after plugin uninstall', 'frisbee-woocommerce-payment-gateway'),
+                'default' => 'no',
             ),
         );
     }
