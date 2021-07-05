@@ -263,6 +263,12 @@ class WC_frisbee extends WC_Payment_Gateway
                 'options' => $this->getPaymentOrderStatuses(),
                 'default' => 'none',
             ),
+            'delete_data_after_uninstall' => array(
+                'title' => __('Enable/Disable', 'frisbee-woocommerce-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Delete settings after plugin uninstall', 'frisbee-woocommerce-payment-gateway'),
+                'default' => 'no',
+            ),
         );
     }
 

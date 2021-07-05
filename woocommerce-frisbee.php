@@ -40,6 +40,7 @@ if ( ! class_exists( 'WC_PaymentFrisbee' ) ) :
         {
             add_action( 'plugins_loaded', array( $this, 'init' ) );
             add_action( 'woocommerce_api_frisbee_webhook' , array( $this, 'webhook' ) );
+            register_uninstall_hook( __FILE__, array($this, 'plugin_uninstall'));
         }
 
         /**
@@ -120,6 +121,14 @@ if ( ! class_exists( 'WC_PaymentFrisbee' ) ) :
                 $order = new WC_Order($orderId);
                 $order->payment_complete();
                 wc_reduce_stock_levels($orderId);
+            }
+        }
+
+        public function plugin_uninstall()
+        {
+            $options = get_option('woocommerce_frisbee_settings');
+            if (isset($options['delete_data_after_uninstall']) && $options['delete_data_after_uninstall'] == 'yes') {
+                delete_option('woocommerce_frisbee_settings');
             }
         }
     }
