@@ -291,7 +291,7 @@ class WC_frisbee extends WC_Payment_Gateway
             'save_data_after_uninstall' => array(
                 'title' => __('Enable/Disable', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('Save settings after plugin uninstall', 'frisbee-woocommerce-payment-gateway'),
+                'label' => __('Keep data after plugin uninstall', 'frisbee-woocommerce-payment-gateway'),
                 'default' => 'no',
             ),
         );
@@ -331,9 +331,14 @@ class WC_frisbee extends WC_Payment_Gateway
      * Order page
      * @param $order
      */
-    function receipt_page($order)
+    public function receipt_page($order)
     {
-        echo $this->generate_frisbee_form($order);
+        try {
+            wp_redirect($this->generate_frisbee_url($order));
+        } catch (\Exception $exception) {
+            $this->generate_frisbee_form($order);
+            error_log($exception);
+        }
     }
 
     /**
@@ -397,7 +402,7 @@ class WC_frisbee extends WC_Payment_Gateway
     }
 
     /**
-     * Generate checkout
+     * Generate checkout from
      * @param $order_id
      * @return string
      */
@@ -422,6 +427,47 @@ class WC_frisbee extends WC_Payment_Gateway
         $frisbee_args['signature'] = $this->getSignature($frisbee_args, $this->salt);
 
         return $this->get_redirect_form($frisbee_args);
+    }
+
+    /**
+     * Generate checkout url
+     * @param $order_id
+     * @return string
+     */
+    function generate_frisbee_url($order_id)
+    {
+        $order = new WC_Order($order_id);
+        $amount = round( $order->get_total() * 100 );
+        $frisbee_args = array(
+            'order_id' => $this->getUniqueId($order_id),
+            'merchant_id' => $this->merchant_id,
+            'order_desc' => $this->getProductInfo($order_id),
+            'amount' => $amount,
+            'currency' => get_woocommerce_currency(),
+            'server_callback_url' => $this->getCallbackUrl(),
+            'response_url' => $order->get_checkout_order_received_url(),
+            'lang' => $this->getLanguage(),
+            'sender_email' => $this->getEmail($order),
+            'payment_systems' => 'frisbee',
+            'default_payment_system' => 'frisbee',
+        );
+
+        $frisbee_args['signature'] = $this->getSignature($frisbee_args, $this->salt);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://api.fondy.eu/api/checkout/url/');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array('request' => $frisbee_args)));
+        $result = json_decode(curl_exec($ch));
+        if ($result->response->response_status == 'success') {
+            return $result->response->checkout_url;
+        } else {
+            $error = '<p>' . $result->response->error_message . '</p>';
+
+            wp_die($error, __('Error'), array('response' => '500'));
+        }
     }
 
     /**
