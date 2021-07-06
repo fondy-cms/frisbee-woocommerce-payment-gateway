@@ -139,7 +139,7 @@ class WC_frisbee extends WC_Payment_Gateway
     {
         $icon =
             '<img 
-                    src="'  . FRISBEE_BASE_PATH . 'assets/img/frisbee.png' . '" 
+                    src="'  . FRISBEE_BASE_PATH . 'assets/img/frisbee-logo.svg' . '" 
                     alt="Frisbee" />';
         if ($this->showLogo()) {
             return apply_filters('woocommerce_gateway_icon', $icon, $this->id);
