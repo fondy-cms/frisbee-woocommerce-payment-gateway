@@ -162,14 +162,13 @@ class WC_frisbee extends WC_Payment_Gateway
     public function getTitle()
     {
         $title = $this->get_option('title');
-        $defaultTitle = __('Buy now pay later', self::DOMAIN);
 
         if ($title) {
             return $title;
         } elseif ($this->showLogo()) {
-            return trim(str_ireplace('Frisbee', '', $defaultTitle));
+            return __('Buy now, pay later', self::DOMAIN);
         } else {
-            return $defaultTitle;
+            return __('Buy now, pay later with Frisbee', self::DOMAIN);
         }
     }
 
