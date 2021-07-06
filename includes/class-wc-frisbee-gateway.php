@@ -455,7 +455,7 @@ class WC_frisbee extends WC_Payment_Gateway
         $frisbee_args['signature'] = $this->getSignature($frisbee_args, $this->salt);
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://api.fondy.eu/api/checkout/url/');
+        curl_setopt($ch, CURLOPT_URL, $this->apiHost . '/api/checkout/url/');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
         curl_setopt($ch, CURLOPT_POST, true);
