@@ -40,7 +40,7 @@ if ( ! class_exists( 'WC_PaymentFrisbee' ) ) :
         {
             add_action( 'plugins_loaded', array( $this, 'init' ) );
             add_action( 'woocommerce_api_frisbee_webhook' , array( $this, 'webhook' ) );
-            register_uninstall_hook( __FILE__, array($this, 'plugin_uninstall'));
+            register_uninstall_hook( __FILE__, 'plugin_uninstall');
         }
 
         /**
@@ -115,12 +115,10 @@ if ( ! class_exists( 'WC_PaymentFrisbee' ) ) :
         public function webhook()
         {
             $wcFrisbee = new WC_frisbee();
+            $data = $wcFrisbee->getRequestData();
 
-            if (isset($_REQUEST['order_id']) && $wcFrisbee->isPaymentValid($_REQUEST)) {
-                $orderId = $wcFrisbee->getOrderId($_REQUEST);
-                $order = new WC_Order($orderId);
-                $order->payment_complete();
-                wc_reduce_stock_levels($orderId);
+            if (isset($data['order_id'])) {
+                $wcFrisbee->validatePayment($data);
             }
         }
 

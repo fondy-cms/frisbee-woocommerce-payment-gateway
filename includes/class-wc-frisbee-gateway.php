@@ -124,9 +124,7 @@ class WC_frisbee extends WC_Payment_Gateway
         $this->liveurl = sprintf('%s/api/checkout/redirect/', $this->apiHost);
         $this->refundurl = sprintf('%s/api/reverse/order_id', $this->apiHost);
 
-        if ($this->frisbee_unique = get_option('frisbee_unique', true)) {
-            add_option('frisbee_unique', time());
-        }
+        $this->frisbee_unique = time();
         add_action('woocommerce_receipt_frisbee', array(&$this, 'receipt_page'));
         add_action('wp_enqueue_scripts', array($this, 'frisbee_checkout_scripts'));
     }
@@ -767,7 +765,7 @@ class WC_frisbee extends WC_Payment_Gateway
      * @return bool
      *
      */
-    public function isPaymentValid($response)
+    public function validatePayment($response)
     {
         global $woocommerce;
         $orderId = $this->getOrderId($response);
@@ -850,6 +848,7 @@ class WC_frisbee extends WC_Payment_Gateway
                     $order->update_status($this->default_order_status);
                 }
             }
+            wc_reduce_stock_levels($orderId);
         } elseif ($total != $response['amount'] and $response['tran_type'] != 'verification') {
             $order->add_order_note(__('Transaction ERROR: amount incorrect<br/>FRISBEE ID: ', 'frisbee-woocommerce-payment-gateway') . $response['payment_id']);
             if ($this->declined_order_status and $this->declined_order_status != 'default') {
@@ -862,6 +861,27 @@ class WC_frisbee extends WC_Payment_Gateway
         $woocommerce->cart->empty_cart();
 
         return true;
+    }
+
+    /**
+     * Check pre order class and order status
+     * @param $order_id
+     * @param bool $withoutToken
+     * @return boolean
+     */
+    public function checkPreOrders($order_id, $withoutToken = false)
+    {
+        if (class_exists('WC_Pre_Orders_Order')
+            && WC_Pre_Orders_Order::order_contains_pre_order($order_id)) {
+            if ($withoutToken) {
+                return true;
+            } else {
+                if (WC_Pre_Orders_Order::order_requires_payment_tokenization($order_id)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -992,7 +1012,7 @@ class WC_frisbee extends WC_Payment_Gateway
      * @param bool $indent
      * @return array
      */
-    function frisbee_get_pages($title = false, $indent = true)
+    public function frisbee_get_pages($title = false, $indent = true)
     {
         $wp_pages = get_pages('sort_column=menu_order');
         $page_list = array();
@@ -1015,5 +1035,20 @@ class WC_frisbee extends WC_Payment_Gateway
         }
 
         return $page_list;
+    }
+
+    public function getRequestData()
+    {
+        $data = file_get_contents('php://input');
+
+        if ($data) {
+            $data = json_decode($data, true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $data;
+            }
+        }
+
+        return $_REQUEST;
     }
 }
