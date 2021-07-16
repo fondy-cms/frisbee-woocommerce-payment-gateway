@@ -119,7 +119,7 @@ class WC_frisbee extends WC_Payment_Gateway
         if ($this->test_mode == 'yes') {
             $this->merchant_id = '1601318';
             $this->salt = 'test';
-            $this->apiHost = 'https://public.dev.cipsp.net';
+            $this->apiHost = 'https://dev2.pay.fondy.eu/';
         }
         $this->liveurl = sprintf('%s/api/checkout/redirect/', $this->apiHost);
         $this->refundurl = sprintf('%s/api/reverse/order_id', $this->apiHost);

@@ -155,7 +155,7 @@ msgstr "Статус заказа когда оплата прошла успе�
 
 #: woocommerce-frisbee.php:333
 msgid "Payment expired order status"
-msgstr "Статус заказа при отказе"
+msgstr "Статус заказа при истекшом платеже"
 
 #: woocommerce-frisbee.php:337
 msgid "Order status when payment was expired."
