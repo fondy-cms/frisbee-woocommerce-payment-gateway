@@ -259,13 +259,13 @@ msgstr "Произошла ошибка во время оплаты. Подпи
 
 #: woocommerce-frisbee.php:808
 msgid ""
-"Thank you for shopping with us. However, the transaction has been declined."
-msgstr "Спасибо за покупку ! . Тем не менее, оплата была отклонена ."
+"Thank you for shopping with us. However, the request has been rejected."
+msgstr "Спасибо за покупку ! Тем не менее, заявка была отклонена."
 
 #: woocommerce-frisbee.php:822
 msgid ""
-"Thank you for shopping with us. However, the transaction has been expired."
-msgstr "Спасибо что делаете покупки у нас. Но ваш перевод был отклонен"
+"Thank you for shopping with us. However, the request has been annuled."
+msgstr "Спасибо что делаете покупки у нас. Но ваша заявка была аннулирована."
 
 #: woocommerce-frisbee.php:823
 msgid "Transaction ERROR: order expired<br/>frisbee ID: "

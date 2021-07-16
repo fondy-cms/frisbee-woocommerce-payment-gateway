@@ -14,8 +14,8 @@ if (!defined('FRISBEE_WOOCOMMERCE_VERSION')) {
 class WC_frisbee extends WC_Payment_Gateway
 {
     const ORDER_APPROVED = 'approved';
-    const ORDER_DECLINED = 'declined';
-    const ORDER_EXPIRED = 'expired';
+    const ORDER_REJECTED = 'rejected';
+    const ORDER_ANNULED = 'annuled';
     const SIGNATURE_SEPARATOR = '|';
     const ORDER_SEPARATOR = ":";
     const DOMAIN = 'frisbee-woocommerce-payment-gateway';
@@ -269,12 +269,6 @@ class WC_frisbee extends WC_Payment_Gateway
             ),
             'default_order_status' => array(
                 'title' => __('Successful payment order status', 'frisbee-woocommerce-payment-gateway'),
-                'type' => 'select',
-                'options' => $this->getPaymentOrderStatuses(),
-                'default' => 'none',
-            ),
-            'expired_order_status' => array(
-                'title' => __('Payment expired order status', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'select',
                 'options' => $this->getPaymentOrderStatuses(),
                 'default' => 'none',
@@ -804,8 +798,8 @@ class WC_frisbee extends WC_Payment_Gateway
             return __('An error has occurred during payment. Signature is not valid.', 'frisbee-woocommerce-payment-gateway');
         }
 
-        if ($response['order_status'] == self::ORDER_DECLINED) {
-            $errorMessage = __("Thank you for shopping with us. However, the transaction has been declined.", 'frisbee-woocommerce-payment-gateway');
+        if ($response['order_status'] == self::ORDER_REJECTED) {
+            $errorMessage = __("Thank you for shopping with us. However, the request has been rejected.", 'frisbee-woocommerce-payment-gateway');
             $order->add_order_note('Transaction ERROR: order declined<br/>Frisbee ID: ' . $response['payment_id']);
             if ($this->declined_order_status and $this->declined_order_status != 'default') {
                 $order->update_status($this->declined_order_status);
@@ -818,8 +812,8 @@ class WC_frisbee extends WC_Payment_Gateway
             return $errorMessage;
         }
 
-        if ($response['order_status'] == self::ORDER_EXPIRED) {
-            $errorMessage = __("Thank you for shopping with us. However, the transaction has been expired.", 'frisbee-woocommerce-payment-gateway');
+        if ($response['order_status'] == self::ORDER_ANNULED) {
+            $errorMessage = __("Thank you for shopping with us. However, the request has been annuled.", 'frisbee-woocommerce-payment-gateway');
             $order->add_order_note(__('Transaction ERROR: order expired<br/>FRISBEE ID: ', 'frisbee-woocommerce-payment-gateway') . $response['payment_id']);
             if ($this->expired_order_status and $this->expired_order_status != 'default') {
                 $order->update_status($this->expired_order_status);

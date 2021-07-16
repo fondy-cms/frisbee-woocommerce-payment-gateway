@@ -242,12 +242,12 @@ msgstr ""
 
 #: woocommerce-frisbee.php:808
 msgid ""
-"Thank you for shopping with us. However, the transaction has been declined."
+"Thank you for shopping with us. However, the request has been rejected."
 msgstr ""
 
 #: woocommerce-frisbee.php:822
 msgid ""
-"Thank you for shopping with us. However, the transaction has been expired."
+"Thank you for shopping with us. However, the request has been annuled."
 msgstr ""
 
 #: woocommerce-frisbee.php:823
