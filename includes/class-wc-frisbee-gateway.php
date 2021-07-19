@@ -215,7 +215,7 @@ class WC_frisbee extends WC_Payment_Gateway
                 'title' => __('Enable/Disable', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'checkbox',
                 'label' => __('Enable Frisbee Payment Module.', 'frisbee-woocommerce-payment-gateway'),
-                'default' => 'no',
+                'default' => 'yes',
                 'description' => __('Show in the Payment List as a payment option', 'frisbee-woocommerce-payment-gateway')
             ),
             'test_mode' => array(
