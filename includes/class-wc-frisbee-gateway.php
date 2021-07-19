@@ -798,7 +798,7 @@ class WC_frisbee extends WC_Payment_Gateway
             return __('An error has occurred during payment. Signature is not valid.', 'frisbee-woocommerce-payment-gateway');
         }
 
-        if ($response['order_status'] == self::ORDER_REJECTED) {
+        if ($response['order_status'] == self::ORDER_REJECTED || empty($response['actual_amount'])) {
             $errorMessage = __("Thank you for shopping with us. However, the request has been rejected.", 'frisbee-woocommerce-payment-gateway');
             $order->add_order_note('Transaction ERROR: order declined<br/>Frisbee ID: ' . $response['payment_id']);
             if ($this->declined_order_status and $this->declined_order_status != 'default') {
