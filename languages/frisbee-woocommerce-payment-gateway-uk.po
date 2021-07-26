@@ -330,7 +330,7 @@ msgid "Frisbee | Buy Now, Pay Later"
 msgstr "Frisbee | Оплата частинами"
 
 msgid "Buy now, pay later with Frisbee"
-msgstr "Оплатити частинами через Frisbee"
+msgstr "Оплата частинами з Frisbee"
 
 msgid "After clicking \"Place order\", you will be redirected to the Frisbee service to complete your purchase."
 msgstr "Після натискання кнопки \"Розмістити замовлення\" ви будете перенаправлені на сторінку сервісу Frisbee для завершення покупки."
@@ -339,4 +339,10 @@ msgid "Buy now, pay later service"
 msgstr "Сервіс оплати частинами"
 
 msgid "Buy now, pay later"
-msgstr "Купуй зараз, плати потім"
+msgstr "Оплата частинами"
+
+msgid "Keep data"
+msgstr "Збереження даних"
+
+msgid "Keep plugin data and settings after uninstall"
+msgstr "Зберегти дані та налаштування плагіну після його видалення"

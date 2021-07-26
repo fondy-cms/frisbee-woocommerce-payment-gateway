@@ -161,9 +161,11 @@ class WC_frisbee extends WC_Payment_Gateway
     {
         $title = $this->get_option('title');
 
-        if (!$title && $this->showLogo()) {
+        if ($this->showLogo() && !$title) {
             $title = __('Buy now, pay later', self::DOMAIN);
-        } else {
+        }
+
+        if (!$this->showLogo() && !$title) {
             $title = __('Buy now, pay later with Frisbee', self::DOMAIN);
         }
 
@@ -229,7 +231,7 @@ class WC_frisbee extends WC_Payment_Gateway
             'title' => array(
                 'title' => __('Title:', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'text',
-                'default' => __('Buy now, pay later with Frisbee', 'frisbee-woocommerce-payment-gateway'),
+                'default' => __('Buy now, pay later', 'frisbee-woocommerce-payment-gateway'),
                 'description' => __('This controls the title which the user sees during checkout.', 'frisbee-woocommerce-payment-gateway'),
                 'desc_tip' => true
             ),
@@ -280,9 +282,9 @@ class WC_frisbee extends WC_Payment_Gateway
                 'default' => 'none',
             ),
             'save_data_after_uninstall' => array(
-                'title' => __('Enable/Disable', 'frisbee-woocommerce-payment-gateway'),
+                'title' => __('Keep data', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('Keep data after plugin uninstall', 'frisbee-woocommerce-payment-gateway'),
+                'label' => __('Keep plugin data and settings after uninstall', 'frisbee-woocommerce-payment-gateway'),
                 'default' => 'no',
             ),
         );

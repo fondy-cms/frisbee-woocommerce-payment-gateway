@@ -307,3 +307,12 @@ msgstr ""
 #. Author URI of the plugin
 msgid "https://frisbee.eu/"
 msgstr ""
+
+msgid "Buy now, pay later"
+msgstr ""
+
+msgid "Keep data"
+msgstr ""
+
+msgid "Keep plugin data and settings after uninstall"
+msgstr ""
