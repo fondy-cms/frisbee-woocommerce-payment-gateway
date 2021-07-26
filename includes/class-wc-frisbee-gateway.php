@@ -161,15 +161,19 @@ class WC_frisbee extends WC_Payment_Gateway
     {
         $title = $this->get_option('title');
 
-        if ($this->showLogo() && !$title) {
+        if ($this->showLogo() && (!$title || $title == 'Buy now, pay later')) {
             $title = __('Buy now, pay later', self::DOMAIN);
         }
 
-        if (!$this->showLogo() && !$title) {
+        if (!$this->showLogo() && (!$title || $title == 'Buy now, pay later')) {
             $title = __('Buy now, pay later with Frisbee', self::DOMAIN);
         }
 
-        return preg_replace('/(.*)\sFrisbee/i', '$1', $title, 1);
+        if ($this->showLogo()) {
+            return preg_replace('/(.*)\sFrisbee/i', '$1', $title, 1);
+        }
+
+        return $title;
     }
 
     /**
