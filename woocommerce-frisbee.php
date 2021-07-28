@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: WooCommerce - Frisbee | Buy Now, Pay Later
-Plugin URI: https://fondy.eu
+Plugin URI: https://frisbee.ua/
 Description: Frisbee payments plugin for WooCommerce.
 Version: 1.0.0
 Author: Frisbee | Buy Now, Pay Later

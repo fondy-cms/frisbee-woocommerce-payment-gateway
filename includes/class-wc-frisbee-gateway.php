@@ -50,7 +50,7 @@ class WC_frisbee extends WC_Payment_Gateway
         $this->init_form_fields();
         $this->init_settings();
 
-        $this->title = $this->getTitle();
+        $this->title = __('Buy now, pay later', self::DOMAIN);
         $this->test_mode = $this->get_option('test_mode');
         $this->calendar = $this->get_option('calendar');
         $this->redirect_page_id = $this->get_option('redirect_page_id');
@@ -114,6 +114,8 @@ class WC_frisbee extends WC_Payment_Gateway
         }
         if (isset($this->on_checkout_page) and $this->on_checkout_page == 'yes') {
             add_filter('woocommerce_order_button_html', array(&$this, 'custom_order_button_html'));
+        } elseif (is_admin()) {
+            wp_enqueue_style('frisbee-admin', FRISBEE_BASE_PATH . 'assets/css/frisbee_admin_styles.css');
         }
         $this->apiHost = 'https://api.fondy.eu';
         if ($this->test_mode == 'yes') {
@@ -244,19 +246,21 @@ class WC_frisbee extends WC_Payment_Gateway
                 'type' => 'textarea',
                 'default' => __('After clicking "Place order", you will be redirected to the Frisbee service to complete your purchase.', 'frisbee-woocommerce-payment-gateway'),
                 'description' => __('This controls the description which the user sees during checkout.', 'frisbee-woocommerce-payment-gateway'),
-                'desc_tip' => true
+                'desc_tip' => true,
             ),
             'merchant_id' => array(
                 'title' => __('Merchant ID:', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'text',
-                'description' => __('Ask Frisbee support about your ID.'),
-                'desc_tip' => true
+                'description' => __('Ask Frisbee support about your ID.', 'frisbee-woocommerce-payment-gateway'),
+                'desc_tip' => true,
+                'required' => true,
             ),
             'salt' => array(
                 'title' => __('Payment key:', 'frisbee-woocommerce-payment-gateway'),
                 'type' => 'text',
-                'description' => __('Given to Merchant by frisbee', 'frisbee-woocommerce-payment-gateway'),
-                'desc_tip' => true
+                'description' => __('Ask Frisbee support to provide you with a key.', 'frisbee-woocommerce-payment-gateway'),
+                'desc_tip' => true,
+                'required' => true,
             ),
             'showlogo' => array(
                 'title' => __('Show Frisbee logo', 'frisbee-woocommerce-payment-gateway'),
