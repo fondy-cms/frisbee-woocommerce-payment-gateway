@@ -916,11 +916,7 @@ class WC_frisbee extends WC_Payment_Gateway
         }
         list($orderId,) = explode(self::ORDER_SEPARATOR, $_POST['order_id']);
         $order = new WC_Order($orderId);
-        $paymentInfo = $this->isPaymentValid($_POST);
-        if ($paymentInfo === true and $_POST['order_status'] == 'reversed') {
-            $order->add_order_note(__('Refund Frisbee status: ' . esc_sql($_POST['order_status']) . ', Refund payment id: ' . esc_sql($_POST['payment_id']), 'frisbee-woocommerce-payment-gateway'));
-            die('Order Reversed');
-        }
+        $paymentInfo = $this->validatePayment($_POST);
         if ($paymentInfo === true and !$order->is_paid()) {
             if ($_POST['order_status'] == self::ORDER_APPROVED) {
                 $this->msg['message'] = __("Thank you for shopping with us. Your account has been charged and your transaction is successful.", 'frisbee-woocommerce-payment-gateway');
@@ -930,13 +926,6 @@ class WC_frisbee extends WC_Payment_Gateway
             $this->msg['class'] = 'error';
             $this->msg['message'] = $paymentInfo;
             $order->add_order_note("ERROR: " . $paymentInfo);
-        }
-        if ($this->is_subscription($orderId)) {
-            if (!empty($_POST['rectoken'])) {
-                $this->save_card($_POST, $order);
-            } else {
-                $order->add_order_note('Transaction Subscription ERROR: no card token');
-            }
         }
 
         if (isset($callback) && isset($_REQUEST['is_callback'])) { // return 200 to callback
